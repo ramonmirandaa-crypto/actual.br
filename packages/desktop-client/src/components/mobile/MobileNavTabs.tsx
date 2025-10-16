@@ -14,6 +14,8 @@ import {
   SvgAdd,
   SvgCog,
   SvgCreditCard,
+  SvgCurrencyDollar,
+  SvgChart,
   SvgPiggyBank,
   SvgReports,
   SvgStoreFront,
@@ -98,6 +100,18 @@ export function MobileNavTabs() {
       path: '/budget',
       style: navTabStyle,
       Icon: SvgWallet,
+    },
+    {
+      name: t('Investments'),
+      path: '/investimentos',
+      style: navTabStyle,
+      Icon: SvgChart,
+    },
+    {
+      name: t('Loans'),
+      path: '/emprestimos',
+      style: navTabStyle,
+      Icon: SvgCurrencyDollar,
     },
     {
       name: t('Transaction'),

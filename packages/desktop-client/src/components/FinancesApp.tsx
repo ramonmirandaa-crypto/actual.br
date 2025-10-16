@@ -1,5 +1,5 @@
 // @ts-strict-ignore
-import React, { type ReactElement, useEffect, useRef } from 'react';
+import React, { type ReactElement, useEffect, useMemo, useRef } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Route, Routes, Navigate, useLocation, useHref } from 'react-router';
 
@@ -31,6 +31,8 @@ import { Settings } from './settings';
 import { Sidebar } from './sidebar/Sidebar';
 import { ManageTagsPage } from './tags/ManageTagsPage';
 import { Titlebar } from './Titlebar';
+import { InvestmentsDashboard } from './investments/InvestmentsDashboard';
+import { LoansDashboard } from './loans/LoansDashboard';
 
 import { getLatestAppVersion, sync } from '@desktop-client/app/appSlice';
 import { ProtectedRoute } from '@desktop-client/auth/ProtectedRoute';
@@ -42,6 +44,7 @@ import { useMetaThemeColor } from '@desktop-client/hooks/useMetaThemeColor';
 import { useNavigate } from '@desktop-client/hooks/useNavigate';
 import { addNotification } from '@desktop-client/notifications/notificationsSlice';
 import { useSelector, useDispatch } from '@desktop-client/redux';
+import { useFormat } from '@desktop-client/hooks/useFormat';
 
 function NarrowNotSupported({
   redirectTo = '/budget',
@@ -88,6 +91,7 @@ export function FinancesApp() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const format = useFormat();
 
   const accounts = useAccounts();
   const isAccountsLoaded = useSelector(state => state.account.isAccountsLoaded);
@@ -189,6 +193,27 @@ export function FinancesApp() {
 
   const scrollableRef = useRef<HTMLDivElement>(null);
 
+  const totalBalance = useMemo(() => {
+    return accounts.reduce((sum, account) => {
+      const balance =
+        (account?.balance_current as number | undefined) ??
+        (account?.balance as number | undefined) ??
+        0;
+      return sum + balance;
+    }, 0);
+  }, [accounts]);
+
+  const averageBalance = useMemo(() => {
+    if (accounts.length === 0) {
+      return 0;
+    }
+    return Math.round(totalBalance / accounts.length);
+  }, [accounts.length, totalBalance]);
+
+  const activeAccounts = useMemo(() => {
+    return accounts.filter(account => !account?.closed).length;
+  }, [accounts]);
+
   const headerContent = (
     <View style={{ position: 'relative', paddingTop: 52 }}>
       <Titlebar
@@ -202,29 +227,57 @@ export function FinancesApp() {
           zIndex: 2,
         }}
       />
-      <Stack direction="row" justify="space-between" align="center">
-        <View style={{ maxWidth: 640 }}>
-          <Text style={{ fontSize: 30, fontWeight: 700 }}>
-            <Trans>Your financial cockpit</Trans>
+      <Stack direction="row" justify="space-between" align="start" spacing={4}>
+        <View className="finance-dashboard__headline">
+          <Text className="finance-dashboard__title">
+            <Trans i18nKey="finances.header.title">
+              Seu centro financeiro inteligente
+            </Trans>
           </Text>
-          <Text style={{ color: 'var(--modern-muted)', marginTop: 6 }}>
+          <Text className="finance-dashboard__subtitle">
             <Trans
               i18nKey="finances.header.subtitle"
               values={{ count: accounts.length }}
             >
-              Manage {{ count }} accounts with a modern, intuitive interface.
+              Organize {{ count }} contas, investimentos e empréstimos com métricas em tempo real e visual moderno.
             </Trans>
           </Text>
         </View>
-        <Stack direction="row" align="center" spacing={3}>
+        <Stack
+          direction="row"
+          align="center"
+          spacing={3}
+          style={{ flexWrap: 'wrap' }}
+        >
+          <Button onPress={() => navigate('/investimentos')}>
+            {t('finances.header.actions.investments')}
+          </Button>
           <Button variant="bare" onPress={() => navigate('/cards')}>
-            <Trans>Credit cards</Trans>
+            {t('finances.header.actions.cards')}
           </Button>
           <Button variant="primary" onPress={() => dispatch(sync())}>
-            <Trans>Sync now</Trans>
+            {t('finances.header.actions.sync')}
           </Button>
         </Stack>
       </Stack>
+
+      <View className="finance-header__metrics">
+        <div className="finance-header__metric">
+          <span>{t('finances.header.metrics.totalBalance')}</span>
+          <strong>{format(totalBalance, 'financial')}</strong>
+          <small>{t('finances.header.metrics.totalBalanceHint')}</small>
+        </div>
+        <div className="finance-header__metric">
+          <span>{t('finances.header.metrics.averageBalance')}</span>
+          <strong>{format(averageBalance, 'financial')}</strong>
+          <small>{t('finances.header.metrics.averageBalanceHint')}</small>
+        </div>
+        <div className="finance-header__metric">
+          <span>{t('finances.header.metrics.activeAccounts')}</span>
+          <strong>{activeAccounts}</strong>
+          <small>{t('finances.header.metrics.activeAccountsHint')}</small>
+        </div>
+      </View>
     </View>
   );
 
@@ -271,6 +324,13 @@ export function FinancesApp() {
               />
 
               <Route path="/reports/*" element={<Reports />} />
+
+              <Route
+                path="/investimentos"
+                element={<InvestmentsDashboard />}
+              />
+
+              <Route path="/emprestimos" element={<LoansDashboard />} />
 
               <Route
                 path="/budget"
@@ -376,6 +436,8 @@ export function FinancesApp() {
             <Route path="/rules" element={<MobileNavTabs />} />
             <Route path="/payees" element={<MobileNavTabs />} />
             <Route path="/cards" element={<MobileNavTabs />} />
+            <Route path="/investimentos" element={<MobileNavTabs />} />
+            <Route path="/emprestimos" element={<MobileNavTabs />} />
             <Route path="*" element={null} />
           </Routes>
         </ScrollProvider>

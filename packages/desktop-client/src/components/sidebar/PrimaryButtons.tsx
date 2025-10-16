@@ -5,8 +5,10 @@ import { useLocation } from 'react-router';
 import {
   SvgCheveronDown,
   SvgCheveronRight,
+  SvgChart,
   SvgCog,
   SvgCreditCard,
+  SvgCurrencyDollar,
   SvgReports,
   SvgStoreFront,
   SvgTag,
@@ -47,6 +49,8 @@ export function PrimaryButtons() {
   return (
     <View style={{ flexShrink: 0 }}>
       <Item title={t('Budget')} Icon={SvgWallet} to="/budget" />
+      <Item title={t('Investments')} Icon={SvgChart} to="/investimentos" />
+      <Item title={t('Loans')} Icon={SvgCurrencyDollar} to="/emprestimos" />
       <Item title={t('Reports')} Icon={SvgReports} to="/reports" />
       <Item title={t('Credit cards')} Icon={SvgCreditCard} to="/cards" />
       <Item title={t('Schedules')} Icon={SvgCalendar3} to="/schedules" />
