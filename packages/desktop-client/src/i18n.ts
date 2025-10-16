@@ -25,13 +25,12 @@ i18n
   .use(initReactI18next)
   .use(resourcesToBackend(loadLanguage))
   .init({
-    lng: 'en',
+    lng: 'pt-BR',
 
     // allow keys to be phrases having `:`, `.`
     nsSeparator: false,
     keySeparator: false,
-    // do not load a fallback
-    fallbackLng: false,
+    fallbackLng: ['pt-BR', 'en'],
     interpolation: {
       escapeValue: false,
     },
@@ -44,7 +43,7 @@ export const setI18NextLanguage = (language: string) => {
   if (!language) {
     // System default
     setI18NextLanguage(
-      Platform.isPlaywright ? 'cimode' : navigator.language || 'en',
+      Platform.isPlaywright ? 'cimode' : navigator.language || 'pt-BR',
     );
     return;
   }
@@ -71,7 +70,13 @@ export const setI18NextLanguage = (language: string) => {
       return;
     }
 
-    // Fall back to English
+    if (language !== 'pt-BR') {
+      console.info(`Unknown locale ${language}, falling back to pt-BR`);
+      setI18NextLanguage('pt-BR');
+      return;
+    }
+
+    // Fall back to English if Portuguese is unavailable
     console.info(`Unknown locale ${language}, falling back to en`);
     setI18NextLanguage('en');
     return;
