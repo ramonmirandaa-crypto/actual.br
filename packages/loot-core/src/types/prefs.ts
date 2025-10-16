@@ -68,6 +68,19 @@ export type MetadataPrefs = Partial<{
 /**
  * Local preferences applicable to a single device. Stored in local storage.
  */
+export type CreditCardPref = {
+  id: string;
+  name: string;
+  accountId?: string | null;
+  color?: string | null;
+  issuer?: string | null;
+  lastFour?: string | null;
+  limit?: number | null;
+  notes?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+};
+
 export type LocalPrefs = Partial<{
   'ui.showClosedAccounts': boolean;
   'expand-splits': boolean;
@@ -81,6 +94,8 @@ export type LocalPrefs = Partial<{
   reportsViewLabel: boolean;
   sidebarWidth: number;
   'mobile.showSpentColumn': boolean;
+  'ui.creditCards': CreditCardPref[];
+  'ui.creditCards.activeCardId': string;
 }>;
 
 export type Theme =

@@ -66,9 +66,7 @@ export function LanguageSettings() {
     >
       <Text>
         {isEnabled ? (
-          <Trans
-            defaults="<0>Idioma</0> é o idioma de exibição de todos os textos. Observe que nenhuma garantia é fornecida quanto à precisão ou integralidade das traduções que não estejam em inglês. Se você encontrar um erro de tradução, sinta-se à vontade para fazer uma sugestão no <3>Weblate</3>."
-          >
+          <Trans defaults="<0>Idioma</0> é o idioma de exibição de todos os textos. Observe que nenhuma garantia é fornecida quanto à precisão ou integralidade das traduções que não estejam em inglês. Se você encontrar um erro de tradução, sinta-se à vontade para fazer uma sugestão no <3>Weblate</3>.">
             <strong>Language</strong> is the display language of all text.
             Please note that no warranty is provided for the accuracy or
             completeness of non-English translations. If you encounter a
@@ -86,9 +84,7 @@ export function LanguageSettings() {
             .
           </Trans>
         ) : (
-          <Trans
-            defaults="<0>Idioma</0> não está disponível. Siga as instruções <3>aqui</3> para adicionar arquivos de tradução que estejam faltando."
-          >
+          <Trans defaults="<0>Idioma</0> não está disponível. Siga as instruções <3>aqui</3> para adicionar arquivos de tradução que estejam faltando.">
             <strong>Language</strong> support is not available. Please follow
             the instructions{' '}
             <Link
