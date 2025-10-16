@@ -1,0 +1,407 @@
+:root {
+  --modern-background: radial-gradient(
+    circle at 20% 20%,
+    #312e81 0%,
+    #0f172a 45%,
+    #020617 100%
+  );
+  --modern-surface: rgba(15, 23, 42, 0.78);
+  --modern-border: rgba(148, 163, 184, 0.22);
+  --modern-muted: rgba(226, 232, 240, 0.72);
+  --modern-positive: #22c55e;
+  --modern-negative: #f97316;
+  --modern-on-accent: rgba(255, 255, 255, 0.96);
+  --modern-on-accent-muted: rgba(255, 255, 255, 0.78);
+  --modern-shadow-lg: 0 45px 90px rgba(2, 6, 23, 0.58);
+  --modern-shadow-sm: 0 18px 42px rgba(2, 6, 23, 0.35);
+}
+
+html,
+body {
+  background: var(--modern-background);
+  color: #f8fafc;
+  font-family:
+    'Inter',
+    'Inter var',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+.modern-shell {
+  min-height: 100%;
+  width: 100%;
+  background: var(--modern-background);
+  padding: 32px;
+  box-sizing: border-box;
+  color: #f1f5f9;
+}
+
+.modern-shell--narrow {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modern-shell__container {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+  gap: 32px;
+  max-width: 1680px;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+}
+
+.modern-shell__sidebar {
+  background: var(--modern-surface);
+  border: 1px solid var(--modern-border);
+  border-radius: 28px;
+  box-shadow: var(--modern-shadow-lg);
+  overflow: hidden;
+  backdrop-filter: blur(32px);
+}
+
+.modern-shell__main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-height: 0;
+}
+
+.modern-shell__header {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.35),
+    rgba(67, 56, 202, 0.25)
+  );
+  border-radius: 24px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  box-shadow: var(--modern-shadow-sm);
+  padding: 24px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modern-shell__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  background: var(--modern-surface);
+  border-radius: 32px;
+  border: 1px solid var(--modern-border);
+  box-shadow: var(--modern-shadow-lg);
+  padding: 32px;
+  overflow: hidden;
+}
+
+.modern-shell__content--narrow {
+  border-radius: 24px;
+  padding: 18px;
+}
+
+.modern-shell__content > * {
+  min-height: 0;
+}
+
+.modern-shell__footer {
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 24px;
+  border: 1px solid var(--modern-border);
+  padding: 20px 28px;
+  box-shadow: var(--modern-shadow-sm);
+}
+
+.credit-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: #e2e8f0;
+}
+
+.credit-dashboard__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.credit-dashboard__title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 680px;
+}
+
+.credit-dashboard__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.credit-dashboard__card {
+  position: relative;
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: var(--modern-shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background-size: cover;
+  color: var(--modern-on-accent);
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.credit-dashboard__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 65px rgba(79, 70, 229, 0.35);
+}
+
+.credit-dashboard__card--active {
+  border-color: rgba(129, 140, 248, 0.68);
+  box-shadow: 0 32px 90px rgba(99, 102, 241, 0.42);
+}
+
+.credit-dashboard__card--empty {
+  background: rgba(15, 23, 42, 0.62);
+  border-style: dashed;
+  border-color: rgba(148, 163, 184, 0.4);
+  color: var(--modern-muted);
+  align-items: center;
+  justify-content: center;
+}
+
+.credit-dashboard__form {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 28px;
+  border: 1px solid var(--modern-border);
+  box-shadow: var(--modern-shadow-sm);
+  padding: 28px;
+}
+
+.credit-dashboard__form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.credit-dashboard__color-picker {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.credit-dashboard__color {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  box-shadow: var(--modern-shadow-sm);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.credit-dashboard__color:hover {
+  transform: translateY(-2px);
+}
+
+.credit-dashboard__color--selected {
+  border-color: rgba(248, 250, 252, 0.9);
+  transform: translateY(-3px);
+}
+
+.credit-dashboard__notes {
+  grid-column: 1 / -1;
+}
+
+.credit-dashboard__summary {
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.14),
+    rgba(14, 116, 144, 0.12)
+  );
+  border-radius: 28px;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  box-shadow: var(--modern-shadow-sm);
+  padding: 24px 28px;
+}
+
+.credit-dashboard__summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.credit-dashboard__filters,
+.credit-dashboard__chart,
+.credit-dashboard__transactions {
+  background: rgba(15, 23, 42, 0.72);
+  border-radius: 24px;
+  border: 1px solid var(--modern-border);
+  box-shadow: var(--modern-shadow-sm);
+  padding: 24px;
+}
+
+.credit-dashboard__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 18px;
+}
+
+.credit-dashboard__statements {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.credit-dashboard__statement {
+  background: rgba(15, 23, 42, 0.7);
+  border-radius: 24px;
+  border: 1px solid var(--modern-border);
+  padding: 22px;
+  box-shadow: var(--modern-shadow-sm);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.credit-dashboard__statement:hover {
+  transform: translateY(-4px);
+  border-color: rgba(129, 140, 248, 0.45);
+}
+
+.credit-dashboard__statement--active {
+  border-color: rgba(129, 140, 248, 0.7);
+  box-shadow: 0 30px 70px rgba(79, 70, 229, 0.45);
+}
+
+.credit-dashboard__statement-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--modern-on-accent);
+}
+
+.credit-dashboard__statement-tag--charges {
+  background: rgba(250, 204, 21, 0.2);
+}
+
+.credit-dashboard__statement-tag--payments {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.credit-dashboard__statement-tag--net {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+.credit-dashboard__category-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.credit-dashboard__category-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+}
+
+.credit-dashboard__category-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+}
+
+.credit-dashboard__transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.credit-dashboard__transaction-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.credit-dashboard__transaction-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.credit-dashboard__transaction-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.credit-dashboard__tooltip {
+  background: rgba(15, 23, 42, 0.82);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  padding: 12px 16px;
+  color: var(--modern-on-accent);
+  box-shadow: var(--modern-shadow-sm);
+}
+
+@media (max-width: 1200px) {
+  .modern-shell {
+    padding: 24px;
+  }
+
+  .modern-shell__container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modern-shell__sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-shell {
+    padding: 16px;
+  }
+
+  .modern-shell__content {
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .credit-dashboard__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .credit-dashboard__statements {
+    grid-template-columns: 1fr;
+  }
+}

@@ -7,6 +7,8 @@ export { GoCardlessLink } from '../gocardless/GoCardlessLink';
 export { Account as Accounts } from '../accounts/Account';
 export { Account } from '../accounts/Account';
 
+export { CreditCardsPage as CreditCards } from '../cards/CreditCardsPage';
+
 export { ManageRulesPage as Rules } from '../ManageRulesPage';
 export { ManageRulesPage as RuleEdit } from '../ManageRulesPage';
 export { ManagePayeesPage as Payees } from '../payees/ManagePayeesPage';

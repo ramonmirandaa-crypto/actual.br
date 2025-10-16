@@ -1,9 +1,12 @@
 // @ts-strict-ignore
 import React, { type ReactElement, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Route, Routes, Navigate, useLocation, useHref } from 'react-router';
 
+import { Button } from '@actual-app/components/button';
 import { useResponsive } from '@actual-app/components/hooks/useResponsive';
+import { Stack } from '@actual-app/components/stack';
+import { Text } from '@actual-app/components/text';
 import { theme } from '@actual-app/components/theme';
 import { View } from '@actual-app/components/view';
 
@@ -14,6 +17,7 @@ import { BankSync } from './banksync';
 import { BankSyncStatus } from './BankSyncStatus';
 import { CommandBar } from './CommandBar';
 import { GlobalKeys } from './GlobalKeys';
+import { ModernShell } from './layout/ModernShell';
 import { MobileNavTabs } from './mobile/MobileNavTabs';
 import { TransactionEdit } from './mobile/transactions/TransactionEdit';
 import { Notifications } from './Notifications';
@@ -24,7 +28,7 @@ import { UserDirectoryPage } from './responsive/wide';
 import { ScrollProvider } from './ScrollProvider';
 import { useMultiuserEnabled } from './ServerContext';
 import { Settings } from './settings';
-import { FloatableSidebar } from './sidebar';
+import { Sidebar } from './sidebar/Sidebar';
 import { ManageTagsPage } from './tags/ManageTagsPage';
 import { Titlebar } from './Titlebar';
 
@@ -83,6 +87,7 @@ export function FinancesApp() {
 
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const accounts = useAccounts();
   const isAccountsLoaded = useSelector(state => state.account.isAccountsLoaded);
@@ -184,176 +189,197 @@ export function FinancesApp() {
 
   const scrollableRef = useRef<HTMLDivElement>(null);
 
+  const headerContent = (
+    <View style={{ position: 'relative', paddingTop: 52 }}>
+      <Titlebar
+        style={{
+          WebkitAppRegion: 'drag',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 36,
+          zIndex: 2,
+        }}
+      />
+      <Stack direction="row" justify="space-between" align="center">
+        <View style={{ maxWidth: 640 }}>
+          <Text style={{ fontSize: 30, fontWeight: 700 }}>
+            <Trans>Your financial cockpit</Trans>
+          </Text>
+          <Text style={{ color: 'var(--modern-muted)', marginTop: 6 }}>
+            <Trans
+              i18nKey="finances.header.subtitle"
+              values={{ count: accounts.length }}
+            >
+              Manage {{ count }} accounts with a modern, intuitive interface.
+            </Trans>
+          </Text>
+        </View>
+        <Stack direction="row" align="center" spacing={3}>
+          <Button variant="bare" onPress={() => navigate('/cards')}>
+            <Trans>Credit cards</Trans>
+          </Button>
+          <Button variant="primary" onPress={() => dispatch(sync())}>
+            <Trans>Sync now</Trans>
+          </Button>
+        </Stack>
+      </Stack>
+    </View>
+  );
+
   return (
     <View style={{ height: '100%' }}>
       <RouterBehaviors />
       <GlobalKeys />
       <CommandBar />
-      <View
-        style={{
-          flexDirection: 'row',
-          backgroundColor: theme.pageBackground,
-          flex: 1,
-        }}
-      >
-        <FloatableSidebar />
-
-        <View
-          style={{
-            color: theme.pageText,
-            backgroundColor: theme.pageBackground,
-            flex: 1,
-            overflow: 'hidden',
-            width: '100%',
-          }}
+      <ModernShell sidebar={<Sidebar />} header={headerContent}>
+        <ScrollProvider
+          isDisabled={!isNarrowWidth}
+          scrollableRef={scrollableRef}
         >
-          <ScrollProvider
-            isDisabled={!isNarrowWidth}
-            scrollableRef={scrollableRef}
+          <View
+            ref={scrollableRef}
+            style={{
+              flex: 1,
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 24,
+              paddingBottom: 32,
+            }}
           >
-            <View
-              ref={scrollableRef}
-              style={{
-                flex: 1,
-                overflow: 'auto',
-                position: 'relative',
-              }}
-            >
-              <Titlebar
-                style={{
-                  WebkitAppRegion: 'drag',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  zIndex: 1000,
-                }}
-              />
-              <Notifications />
-              <BankSyncStatus />
-
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    isAccountsLoaded ? (
-                      accounts.length > 0 ? (
-                        <Navigate to="/budget" replace />
-                      ) : (
-                        // If there are no accounts, we want to redirect the user to
-                        // the All Accounts screen which will prompt them to add an account
-                        <Navigate to="/accounts" replace />
-                      )
-                    ) : (
-                      <LoadingIndicator />
-                    )
-                  }
-                />
-
-                <Route path="/reports/*" element={<Reports />} />
-
-                <Route
-                  path="/budget"
-                  element={<NarrowAlternate name="Budget" />}
-                />
-
-                <Route
-                  path="/schedules"
-                  element={
-                    <NarrowNotSupported>
-                      <WideComponent name="Schedules" />
-                    </NarrowNotSupported>
-                  }
-                />
-
-                <Route
-                  path="/payees"
-                  element={<NarrowAlternate name="Payees" />}
-                />
-                <Route
-                  path="/rules"
-                  element={<NarrowAlternate name="Rules" />}
-                />
-                <Route
-                  path="/rules/:id"
-                  element={<NarrowAlternate name="RuleEdit" />}
-                />
-                <Route path="/bank-sync" element={<BankSync />} />
-                <Route path="/tags" element={<ManageTagsPage />} />
-                <Route path="/settings" element={<Settings />} />
-
-                <Route
-                  path="/gocardless/link"
-                  element={
-                    <NarrowNotSupported>
-                      <WideComponent name="GoCardlessLink" />
-                    </NarrowNotSupported>
-                  }
-                />
-
-                <Route
-                  path="/accounts"
-                  element={<NarrowAlternate name="Accounts" />}
-                />
-
-                <Route
-                  path="/accounts/:id"
-                  element={<NarrowAlternate name="Account" />}
-                />
-
-                <Route
-                  path="/transactions/:transactionId"
-                  element={
-                    <WideNotSupported>
-                      <TransactionEdit />
-                    </WideNotSupported>
-                  }
-                />
-
-                <Route
-                  path="/categories/:id"
-                  element={<NarrowAlternate name="Category" />}
-                />
-                {multiuserEnabled && (
-                  <Route
-                    path="/user-directory"
-                    element={
-                      <ProtectedRoute
-                        permission={Permissions.ADMINISTRATOR}
-                        element={<UserDirectoryPage />}
-                      />
-                    }
-                  />
-                )}
-                {multiuserEnabled && (
-                  <Route
-                    path="/user-access"
-                    element={
-                      <ProtectedRoute
-                        permission={Permissions.ADMINISTRATOR}
-                        validateOwner={true}
-                        element={<UserAccessPage />}
-                      />
-                    }
-                  />
-                )}
-                {/* redirect all other traffic to the budget page */}
-                <Route path="/*" element={<Navigate to="/budget" replace />} />
-              </Routes>
-            </View>
+            <Notifications />
+            <BankSyncStatus />
 
             <Routes>
-              <Route path="/budget" element={<MobileNavTabs />} />
-              <Route path="/accounts" element={<MobileNavTabs />} />
-              <Route path="/settings" element={<MobileNavTabs />} />
-              <Route path="/reports" element={<MobileNavTabs />} />
-              <Route path="/rules" element={<MobileNavTabs />} />
-              <Route path="/payees" element={<MobileNavTabs />} />
-              <Route path="*" element={null} />
+              <Route
+                path="/"
+                element={
+                  isAccountsLoaded ? (
+                    accounts.length > 0 ? (
+                      <Navigate to="/budget" replace />
+                    ) : (
+                      // If there are no accounts, we want to redirect the user to
+                      // the All Accounts screen which will prompt them to add an account
+                      <Navigate to="/accounts" replace />
+                    )
+                  ) : (
+                    <LoadingIndicator />
+                  )
+                }
+              />
+
+              <Route path="/reports/*" element={<Reports />} />
+
+              <Route
+                path="/budget"
+                element={<NarrowAlternate name="Budget" />}
+              />
+
+              <Route
+                path="/schedules"
+                element={
+                  <NarrowNotSupported>
+                    <WideComponent name="Schedules" />
+                  </NarrowNotSupported>
+                }
+              />
+
+              <Route
+                path="/payees"
+                element={<NarrowAlternate name="Payees" />}
+              />
+              <Route path="/rules" element={<NarrowAlternate name="Rules" />} />
+              <Route
+                path="/rules/:id"
+                element={<NarrowAlternate name="RuleEdit" />}
+              />
+              <Route path="/bank-sync" element={<BankSync />} />
+              <Route path="/tags" element={<ManageTagsPage />} />
+              <Route path="/settings" element={<Settings />} />
+
+              <Route
+                path="/cards"
+                element={
+                  <NarrowNotSupported>
+                    <WideComponent name="CreditCards" />
+                  </NarrowNotSupported>
+                }
+              />
+
+              <Route
+                path="/gocardless/link"
+                element={
+                  <NarrowNotSupported>
+                    <WideComponent name="GoCardlessLink" />
+                  </NarrowNotSupported>
+                }
+              />
+
+              <Route
+                path="/accounts"
+                element={<NarrowAlternate name="Accounts" />}
+              />
+
+              <Route
+                path="/accounts/:id"
+                element={<NarrowAlternate name="Account" />}
+              />
+
+              <Route
+                path="/transactions/:transactionId"
+                element={
+                  <WideNotSupported>
+                    <TransactionEdit />
+                  </WideNotSupported>
+                }
+              />
+
+              <Route
+                path="/categories/:id"
+                element={<NarrowAlternate name="Category" />}
+              />
+              {multiuserEnabled && (
+                <Route
+                  path="/user-directory"
+                  element={
+                    <ProtectedRoute
+                      permission={Permissions.ADMINISTRATOR}
+                      element={<UserDirectoryPage />}
+                    />
+                  }
+                />
+              )}
+              {multiuserEnabled && (
+                <Route
+                  path="/user-access"
+                  element={
+                    <ProtectedRoute
+                      permission={Permissions.ADMINISTRATOR}
+                      validateOwner={true}
+                      element={<UserAccessPage />}
+                    />
+                  }
+                />
+              )}
+              {/* redirect all other traffic to the budget page */}
+              <Route path="/*" element={<Navigate to="/budget" replace />} />
             </Routes>
-          </ScrollProvider>
-        </View>
-      </View>
+          </View>
+
+          <Routes>
+            <Route path="/budget" element={<MobileNavTabs />} />
+            <Route path="/accounts" element={<MobileNavTabs />} />
+            <Route path="/settings" element={<MobileNavTabs />} />
+            <Route path="/reports" element={<MobileNavTabs />} />
+            <Route path="/rules" element={<MobileNavTabs />} />
+            <Route path="/payees" element={<MobileNavTabs />} />
+            <Route path="/cards" element={<MobileNavTabs />} />
+            <Route path="*" element={null} />
+          </Routes>
+        </ScrollProvider>
+      </ModernShell>
     </View>
   );
 }
