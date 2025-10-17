@@ -6,8 +6,25 @@
 # if so, run yarn to install the dependencies.
 #####################################################
 
+set -eu
+
+if ! command -v yarn >/dev/null 2>&1; then
+    if command -v corepack >/dev/null 2>&1; then
+        corepack enable
+        if [ -f package.json ]; then
+            PACKAGE_MANAGER=$(node -p "require('./package.json').packageManager" 2>/dev/null || echo "")
+            if [ -n "$PACKAGE_MANAGER" ]; then
+                corepack prepare "$PACKAGE_MANAGER" --activate
+            fi
+        fi
+    else
+        echo "Error: yarn is not available and corepack could not be found." >&2
+        exit 1
+    fi
+fi
+
 if [ ! -d "node_modules" ] || [ "$(ls -A node_modules)" = "" ]; then
-    yarn
+    yarn install --immutable
 fi
 
 BROWSER=0 yarn start:browser
