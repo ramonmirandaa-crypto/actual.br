@@ -28,5 +28,22 @@ echo "Running VRT tests with the following parameters:"
 echo "E2E_START_URL: $E2E_START_URL"
 echo "VRT_ARGS: $VRT_ARGS"
 
-MSYS_NO_PATHCONV=1 docker run --rm --network host -v "$(pwd)":/work/ -w /work/ -it mcr.microsoft.com/playwright:v1.56.0-jammy /bin/bash \
-  -c "E2E_START_URL=$E2E_START_URL yarn vrt $VRT_ARGS"
+run_vrt_locally() {
+    echo "Running VRT tests directly via yarn."
+    echo "Note: Results may differ from the standardized docker environment."
+    E2E_START_URL="$E2E_START_URL" yarn vrt $VRT_ARGS
+}
+
+if command -v docker >/dev/null 2>&1; then
+    echo "Docker detected. Attempting to run VRT tests inside container."
+    if MSYS_NO_PATHCONV=1 docker run --rm --network host \
+        -v "$(pwd)":/work/ -w /work/ -it mcr.microsoft.com/playwright:v1.56.0-jammy \
+        /bin/bash -lc "E2E_START_URL=$E2E_START_URL yarn vrt $VRT_ARGS"; then
+        exit 0
+    fi
+    echo "Docker command failed. Falling back to local execution."
+    run_vrt_locally
+else
+    echo "Docker is not installed or not available in PATH. Falling back to local execution."
+    run_vrt_locally
+fi
