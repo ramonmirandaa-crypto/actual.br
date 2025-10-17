@@ -170,6 +170,56 @@ app.post(
   }),
 );
 
+app.post(
+  '/statements',
+  handleError(async (req, res) => {
+    const { accountId } = req.body || {};
+
+    try {
+      const statements = await pluggyaiService.getAccountStatements(accountId);
+
+      res.send({
+        status: 'ok',
+        data: {
+          statements,
+        },
+      });
+    } catch (error) {
+      res.send({
+        status: 'ok',
+        data: {
+          error: error.message,
+        },
+      });
+    }
+  }),
+);
+
+app.post(
+  '/bills',
+  handleError(async (req, res) => {
+    const { accountId } = req.body || {};
+
+    try {
+      const bills = await pluggyaiService.getCreditCardBills(accountId);
+
+      res.send({
+        status: 'ok',
+        data: {
+          bills,
+        },
+      });
+    } catch (error) {
+      res.send({
+        status: 'ok',
+        data: {
+          error: error.message,
+        },
+      });
+    }
+  }),
+);
+
 function getDate(date) {
   return date.toISOString().split('T')[0];
 }

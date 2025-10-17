@@ -43,6 +43,8 @@ export interface ApiHandlers {
 
   'api/abort-import': () => Promise<void>;
 
+  'api/import-pluggy': () => Promise<void>;
+
   'api/query': (arg: { query }) => Promise<unknown>;
 
   'api/budget-months': () => Promise<string[]>;
