@@ -338,6 +338,36 @@ debug(`Allowed methods: ${configSchema.get('allowedLoginMethods').join(', ')}`);
 const corsProxyEnabled = configSchema.get('corsProxy.enabled');
 debug(`CORS Proxy enabled: ${corsProxyEnabled}`);
 
+function ensureDirectoryExists(directoryPath) {
+  if (!directoryPath) {
+    return;
+  }
+
+  const resolvedDirectory = path.resolve(directoryPath);
+
+  try {
+    fs.mkdirSync(resolvedDirectory, { recursive: true });
+  } catch (error) {
+    if (error.code !== 'EEXIST') {
+      console.error(
+        `Failed to create required directory "${resolvedDirectory}"`,
+        error,
+      );
+      throw error;
+    }
+  }
+}
+
+const requiredDirectories = [
+  configSchema.get('dataDir'),
+  configSchema.get('serverFiles'),
+  configSchema.get('userFiles'),
+];
+
+for (const directory of requiredDirectories) {
+  ensureDirectoryExists(directory);
+}
+
 const httpsKey = configSchema.get('https.key');
 if (httpsKey) {
   debug(`HTTPS Key: ${'*'.repeat(httpsKey.length)}`);
