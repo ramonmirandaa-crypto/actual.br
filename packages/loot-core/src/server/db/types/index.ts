@@ -21,7 +21,7 @@ export type DbAccount = {
   type?: string | null;
   subtype?: string | null;
   bank?: string | null;
-  account_sync_source?: 'simpleFin' | 'goCardless' | null;
+  account_sync_source?: 'simpleFin' | 'goCardless' | 'pluggyai' | null;
 };
 
 export type DbBank = {
@@ -174,6 +174,32 @@ export type DbTransaction = {
   pending?: 1 | 0 | null;
   location?: string | null;
   type?: string | null;
+};
+
+export type DbPluggyStatement = {
+  id: string;
+  account: DbAccount['id'];
+  statement_id: string;
+  period?: string | null;
+  issued_at?: string | null;
+  due_at?: string | null;
+  currency_code?: string | null;
+  total_amount?: number | null;
+  minimum_amount?: number | null;
+  resource_url?: string | null;
+};
+
+export type DbPluggyCreditBill = {
+  id: string;
+  account: DbAccount['id'];
+  bill_id: string;
+  due_date?: string | null;
+  total_amount?: number | null;
+  minimum_amount?: number | null;
+  currency_code?: string | null;
+  allows_installments?: 1 | 0 | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type DbReflectBudget = {

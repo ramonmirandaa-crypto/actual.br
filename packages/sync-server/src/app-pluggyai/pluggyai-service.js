@@ -117,4 +117,26 @@ export const pluggyaiService = {
 
     return transactions;
   },
+
+  getAccountStatements: async accountId => {
+    try {
+      const client = getPluggyClient();
+      const response = await client.fetchAccountStatements(accountId);
+      return response.results ?? [];
+    } catch (error) {
+      console.error(`Error fetching account statements: ${error.message}`);
+      throw error;
+    }
+  },
+
+  getCreditCardBills: async accountId => {
+    try {
+      const client = getPluggyClient();
+      const response = await client.fetchCreditCardBills(accountId);
+      return response.results ?? [];
+    } catch (error) {
+      console.error(`Error fetching credit card bills: ${error.message}`);
+      throw error;
+    }
+  },
 };

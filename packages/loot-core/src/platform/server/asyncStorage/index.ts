@@ -1,8 +1,10 @@
 // @ts-strict-ignore
-import { GlobalPrefsJson } from '../../../types/prefs';
 import { getDatabase } from '../indexeddb';
 
 import * as T from './index-types';
+import { prepareForStorage, readFromStorage } from './secure-values';
+
+import type { GlobalPrefsJson } from '../../../types/prefs';
 
 export const init: T.Init = function () {};
 
@@ -15,8 +17,11 @@ export const getItem: T.GetItem = async function (key) {
   return new Promise((resolve, reject) => {
     const req = objectStore.get(key);
     req.onerror = e => reject(e);
-    // @ts-expect-error fix me
-    req.onsuccess = e => resolve(e.target.result);
+    req.onsuccess = async e => {
+      const target = e.target as IDBRequest<unknown>;
+      const value = await readFromStorage(key, target.result);
+      resolve(value as GlobalPrefsJson[typeof key]);
+    };
   });
 };
 
@@ -26,10 +31,14 @@ export const setItem: T.SetItem = async function (key, value) {
   const transaction = db.transaction(['asyncStorage'], 'readwrite');
   const objectStore = transaction.objectStore('asyncStorage');
 
-  new Promise((resolve, reject) => {
-    const req = objectStore.put(value, key);
-    req.onerror = e => reject(e);
-    req.onsuccess = () => resolve(undefined);
+  await new Promise((resolve, reject) => {
+    prepareForStorage(key, value)
+      .then(prepared => {
+        const req = objectStore.put(prepared, key);
+        req.onerror = e => reject(e);
+        req.onsuccess = () => resolve(undefined);
+      })
+      .catch(reject);
     transaction.commit();
   });
 };
@@ -62,9 +71,13 @@ export async function multiGet<K extends readonly (keyof GlobalPrefsJson)[]>(
         (resolve, reject) => {
           const req = objectStore.get(key);
           req.onerror = e => reject(e);
-          req.onsuccess = e => {
-            const target = e.target as IDBRequest<GlobalPrefsJson[K[number]]>;
-            resolve([key, target.result]);
+          req.onsuccess = async e => {
+            const target = e.target as IDBRequest<unknown>;
+            const value = (await readFromStorage(
+              key,
+              target.result,
+            )) as GlobalPrefsJson[K[number]];
+            resolve([key, value]);
           };
         },
       );
@@ -92,9 +105,13 @@ export const multiSet: T.MultiSet = async function (keyValues) {
   const promise = Promise.all(
     keyValues.map(([key, value]) => {
       return new Promise((resolve, reject) => {
-        const req = objectStore.put(value, key);
-        req.onerror = e => reject(e);
-        req.onsuccess = () => resolve(undefined);
+        prepareForStorage(key, value)
+          .then(prepared => {
+            const req = objectStore.put(prepared, key);
+            req.onerror = e => reject(e);
+            req.onsuccess = () => resolve(undefined);
+          })
+          .catch(reject);
       });
     }),
   );

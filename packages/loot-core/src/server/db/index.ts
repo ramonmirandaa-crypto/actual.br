@@ -47,6 +47,8 @@ import {
   DbTransaction,
   DbViewTransaction,
   DbViewTransactionInternalAlive,
+  DbPluggyStatement,
+  DbPluggyCreditBill,
 } from './types';
 
 export * from './types';
@@ -135,6 +137,86 @@ export function runQuery<T>(
 
 export function execQuery(sql: string) {
   sqlite.execQuery(db, sql);
+}
+
+export async function upsertPluggyStatement(statement: DbPluggyStatement) {
+  await runQuery(
+    `INSERT INTO pluggy_statements (
+        id,
+        account,
+        statement_id,
+        period,
+        issued_at,
+        due_at,
+        currency_code,
+        total_amount,
+        minimum_amount,
+        resource_url
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(statement_id) DO UPDATE SET
+        account = excluded.account,
+        period = excluded.period,
+        issued_at = excluded.issued_at,
+        due_at = excluded.due_at,
+        currency_code = excluded.currency_code,
+        total_amount = excluded.total_amount,
+        minimum_amount = excluded.minimum_amount,
+        resource_url = excluded.resource_url
+    `,
+    [
+      statement.id,
+      statement.account,
+      statement.statement_id,
+      statement.period ?? null,
+      statement.issued_at ?? null,
+      statement.due_at ?? null,
+      statement.currency_code ?? null,
+      statement.total_amount ?? null,
+      statement.minimum_amount ?? null,
+      statement.resource_url ?? null,
+    ],
+  );
+}
+
+export async function upsertPluggyCreditBill(bill: DbPluggyCreditBill) {
+  await runQuery(
+    `INSERT INTO pluggy_credit_bills (
+        id,
+        account,
+        bill_id,
+        due_date,
+        total_amount,
+        minimum_amount,
+        currency_code,
+        allows_installments,
+        created_at,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(bill_id) DO UPDATE SET
+        account = excluded.account,
+        due_date = excluded.due_date,
+        total_amount = excluded.total_amount,
+        minimum_amount = excluded.minimum_amount,
+        currency_code = excluded.currency_code,
+        allows_installments = excluded.allows_installments,
+        created_at = excluded.created_at,
+        updated_at = excluded.updated_at
+    `,
+    [
+      bill.id,
+      bill.account,
+      bill.bill_id,
+      bill.due_date ?? null,
+      bill.total_amount ?? null,
+      bill.minimum_amount ?? null,
+      bill.currency_code ?? null,
+      bill.allows_installments ?? null,
+      bill.created_at ?? null,
+      bill.updated_at ?? null,
+    ],
+  );
 }
 
 // This manages an LRU cache of prepared query statements. This is

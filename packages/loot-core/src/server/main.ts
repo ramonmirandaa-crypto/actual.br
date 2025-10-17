@@ -23,6 +23,7 @@ import { app as dashboardApp } from './dashboard/app';
 import * as db from './db';
 import * as encryption from './encryption';
 import { app as encryptionApp } from './encryption/app';
+import { ensureLocalDocumentsDir, getLocalDocumentsDir } from './db/local-storage';
 import { app as filtersApp } from './filters/app';
 import { app } from './main-app';
 import { mutator, runHandler } from './mutators';
@@ -154,7 +155,7 @@ app.combine(
 );
 
 export function getDefaultDocumentDir() {
-  return fs.join(process.env.ACTUAL_DOCUMENT_DIR, 'Actual');
+  return getLocalDocumentsDir();
 }
 
 async function setupDocumentsDir() {
@@ -167,18 +168,20 @@ async function setupDocumentsDir() {
 
   let documentDir = await asyncStorage.getItem('document-dir');
 
-  // Test the existing documents directory to make sure it's a valid
-  // path that exists, and if it errors fallback to the default one
-  if (documentDir) {
-    try {
-      await ensureExists(documentDir);
-    } catch (e) {
-      documentDir = null;
-    }
+  // Migrate data from any legacy location to the local data directory
+  let migrated = false;
+  try {
+    const result = await ensureLocalDocumentsDir(documentDir ?? null);
+    documentDir = result.dir;
+    migrated = result.migrated;
+  } catch (error) {
+    logger.error('Failed to migrate documents directory', error);
+    documentDir = getDefaultDocumentDir();
+    await ensureExists(documentDir);
   }
 
-  if (!documentDir) {
-    documentDir = getDefaultDocumentDir();
+  if (migrated || (await asyncStorage.getItem('document-dir')) !== documentDir) {
+    await asyncStorage.setItem('document-dir', documentDir);
   }
 
   await ensureExists(documentDir);

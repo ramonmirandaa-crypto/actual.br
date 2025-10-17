@@ -46,6 +46,7 @@ import { runMutator } from './mutators';
 import * as prefs from './prefs';
 import * as sheet from './sheet';
 import { setSyncingMode, batchMessages } from './sync';
+import { importPluggyData } from './importers/pluggy';
 
 let IMPORT_MODE = false;
 
@@ -347,6 +348,11 @@ handlers['api/abort-import'] = async function () {
   }
 
   IMPORT_MODE = false;
+};
+
+handlers['api/import-pluggy'] = async function () {
+  checkFileOpen();
+  await importPluggyData();
 };
 
 handlers['api/query'] = async function ({ query }) {
